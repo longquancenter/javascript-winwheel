@@ -1,216 +1,222 @@
-<!--
-    Winhweel.js 针脚和声音示例 由 Douglas McKechie 提供 @ www.dougtesting.net
-    请访问网站获取教程和其他文档。
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5 Canvas 中奖轮盘</title>
+    <link rel="stylesheet" href="main.css" type="text/css" />
+    <script type="text/javascript" src="../../Winwheel.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+    <style>
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(173, 216, 230, 0.9); /* 稍微增加不透明度 */
+            color: #333;
+            padding: 30px; /* 增加内边距 */
+            border-radius: 15px; /* 增加圆角 */
+            text-align: center;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* 增强阴影效果 */
+            min-width: 300px; /* 设置最小宽度 */
+        }
+        .popup.show {
+            display: block;
+        }
+        #popupMessage {
+            font-size: 24px; /* 增大字体大小 */
+            font-weight: bold; /* 加粗字体 */
+            color: #1e90ff; /* 使用更醒目的颜色 */
+            margin-bottom: 20px; /* 增加底部边距 */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* 添加轻微文字阴影 */
+        }
+        .popup button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px; /* 减小按钮大小 */
+            font-size: 14px; /* 减小字体大小 */
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s, transform 0.1s;
+        }
+        .popup button:hover {
+            background: #45a049;
+            transform: scale(1.05); /* 鼠标悬停时稍微放大按钮 */
+        }
+    </style>
+</head>
+<body>
+    <div align="center">
+        <h1>Winwheel.js 示例轮盘 - 针脚和声音轮盘</h1>
+        <p>
+            这是一个包含外部针脚的轮盘示例（这些代表了真实奖品轮盘通常拥有的金属杆）。
+            <br />此外，当其中一个针脚经过指针时，轮盘会播放滴答声。
+        </p>
+        <br />
+        <p>选择一个力度设置，然后按下旋转按钮。滴答声将在针脚经过指针时播放。</p>
+        <br />
+        <table cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td>
+                    <div class="power_controls">
+                        <br />
+                        <br />
+                        <table class="power" cellpadding="10" cellspacing="0">
+                            <tr>
+                                <th align="center">力度</th>
+                            </tr>
+                            <tr>
+                                <td width="78" align="center" id="pw3" onClick="powerSelected(3);">高</td>
+                            </tr>
+                            <tr>
+                                <td align="center" id="pw2" onClick="powerSelected(2);">中</td>
+                            </tr>
+                            <tr>
+                                <td align="center" id="pw1" onClick="powerSelected(1);">低</td>
+                            </tr>
+                        </table>
+                        <br />
+                        <img id="spin_button" src="spin_off.png" alt="旋转" onClick="startSpin();" />
+                        <br /><br />
+                        &nbsp;&nbsp;<a href="#" onClick="resetWheel(); return false;">再玩一次</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(重置)
+                    </div>
+                </td>
+                <td width="438" height="582" class="the_wheel" align="center" valign="center">
+                    <canvas id="canvas" width="434" height="434">
+                        <p style="{color: white}" align="center">对不起，您的浏览器不支持 canvas。请尝试其他浏览器。</p>
+                    </canvas>
+                </td>
+            </tr>
+        </table>
+    </div>
 
-    MIT 许可证 (MIT)
+    <div id="popup" class="popup">
+        <div id="popupMessage"></div>
+        <button onclick="playAgain()">再玩一次</button>
+    </div>
 
-    版权所有 (c) 2018 Douglas McKechie
-
-    特此免费授予任何获得本软件及相关文档（“软件”）副本的人，允许他们无限制地使用、复制、修改、合并、出版、分发、再许可和/或出售软件的副本，并允许向其提供软件的人这样做，前提是满足以下条件：
-
-    上述版权声明和本许可声明应包含在软件的所有副本或重要部分中。
-
-    本软件按“原样”提供，不附任何形式的明示或暗示的担保，包括但不限于适销性、特定目的适用性和不侵权的担保。在任何情况下，作者或版权持有人均不对因使用或其他交易中的软件或软件的使用而引起的任何索赔、损害或其他责任承担责任，无论是合同诉讼、侵权诉讼还是其他。
-
-    ============================================================================
-
-    注：
-        Tick 音效由 DeepFrozenApps 录制，并从 http://soundbible.com/2044-Tick.html 下载。
-        它具有署名 3.0 许可证。
--->
-<html>
-    <head>
-        <title>HTML5 Canvas 中奖轮盘</title>
-        <link rel="stylesheet" href="main.css" type="text/css" />
-        <script type="text/javascript" src="../../Winwheel.js"></script>
-        <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
-    </head>
-    <body>
-        <div align="center">
-            <h1>Winwheel.js 示例轮盘 - 针脚和声音轮盘</h1>
-            <p>
-                这是一个包含外部针脚的轮盘示例（这些代表了真实奖品轮盘通常拥有的金属杆）。
-                <br />此外，当其中一个针脚经过指针时，轮盘会播放滴答声。
-            </p>
-            <br />
-            <p>选择一个力度设置，然后按下旋转按钮。滴答声将在针脚经过指针时播放。</p>
-            <br />
-            <table cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                    <td>
-                        <div class="power_controls">
-                            <br />
-                            <br />
-                            <table class="power" cellpadding="10" cellspacing="0">
-                                <tr>
-                                    <th align="center">力度</th>
-                                </tr>
-                                <tr>
-                                    <td width="78" align="center" id="pw3" onClick="powerSelected(3);">高</td>
-                                </tr>
-                                <tr>
-                                    <td align="center" id="pw2" onClick="powerSelected(2);">中</td>
-                                </tr>
-                                <tr>
-                                    <td align="center" id="pw1" onClick="powerSelected(1);">低</td>
-                                </tr>
-                            </table>
-                            <br />
-                            <img id="spin_button" src="spin_off.png" alt="旋转" onClick="startSpin();" />
-                            <br /><br />
-                            &nbsp;&nbsp;<a href="#" onClick="resetWheel(); return false;">再玩一次</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(重置)
-                        </div>
-                    </td>
-                    <td width="438" height="582" class="the_wheel" align="center" valign="center">
-                        <canvas id="canvas" width="434" height="434">
-                            <p style="{color: white}" align="center">对不起，您的浏览器不支持 canvas。请尝试其他浏览器。</p>
-                        </canvas>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <script>
-            // 创建新的轮盘对象并在创建时指定参数。
-            let theWheel = new Winwheel({
-                'numSegments'  : 8,     // 指定段的数量。
-                'outerRadius'  : 212,   // 设置外半径，以便轮盘适合背景。
-                'textFontSize' : 28,    // 设置所需的字体大小。
-                'segments'     :        // 定义段，包括颜色和文本。
-                [
-                   {'fillStyle' : '#eae56f', 'text' : '奖品 1'},
-                   {'fillStyle' : '#89f26e', 'text' : '奖品 2'},
-                   {'fillStyle' : '#7de6ef', 'text' : '奖品 3'},
-                   {'fillStyle' : '#e7706f', 'text' : '奖品 4'},
-                   {'fillStyle' : '#eae56f', 'text' : '奖品 5'},
-                   {'fillStyle' : '#89f26e', 'text' : '奖品 6'},
-                   {'fillStyle' : '#7de6ef', 'text' : '奖品 7'},
-                   {'fillStyle' : '#e7706f', 'text' : '奖品 8'}
-                ],
-                'animation' :           // 指定使用的动画。
-                {
-                    'type'     : 'spinToStop',
-                    'duration' : 15,
-                    'spins'    : 8,
-                    'callbackFinished' : alertPrize,
-                    'callbackSound'    : playSound,   // 当需要触发滴答声时调用的函数。
-                    'soundTrigger'     : 'pin'        // 指定触发声音的针脚，另一种选项是 'segment'。
-                },
-                'pins' :
-                {
-                    'number' : 16   // 针脚数量。它们均匀分布在轮盘周围。
-                }
-            });
-
-            // -----------------------------------------------------------------
-            // 当奖品指针下的段发生变化时调用此函数
-            // 我们可以在这里播放像真实奖品轮盘那样的小滴答声。
-            // -----------------------------------------------------------------
-            let audio = new Audio('tick.mp3');  // 创建音频对象并加载 tick.mp3 文件。
-
-            function playSound()
+    <script>
+        // 创建新的轮盘对象并在创建时指定参数。
+        let theWheel = new Winwheel({
+            'numSegments'  : 8,     // 指定段的数量。
+            'outerRadius'  : 212,   // 设置外半径，以便轮盘适合背景。
+            'textFontSize' : 28,    // 设置所需的字体大小。
+            'segments'     :        // 定义段，包括颜色和文本。
+            [
+                {'fillStyle' : '#eae56f', 'text' : '奖品 1'},
+                {'fillStyle' : '#89f26e', 'text' : '奖品 2'},
+                {'fillStyle' : '#7de6ef', 'text' : '奖品 3'},
+                {'fillStyle' : '#e7706f', 'text' : '奖品 4'},
+                {'fillStyle' : '#eae56f', 'text' : '奖品 5'},
+                {'fillStyle' : '#89f26e', 'text' : '奖品 6'},
+                {'fillStyle' : '#7de6ef', 'text' : '奖品 7'},
+                {'fillStyle' : '#e7706f', 'text' : '奖品 8'}
+            ],
+            'animation' :           // 指定使用的动画。
             {
-                // 如果声音已经在播放，则停止并倒回声音。
-                audio.pause();
-                audio.currentTime = 0;
-
-                // 播放声音。
-                audio.play();
+                'type'     : 'spinToStop',
+                'duration' : 15,
+                'spins'    : 8,
+                'callbackFinished' : alertPrize,
+                'callbackSound'    : playSound,   // 当需要触发滴答声时调用的函数。
+                'soundTrigger'     : 'pin'        // 指定触发声音的针脚，另一种选项是 'segment'。
+            },
+            'pins' :
+            {
+                'number' : 16   // 针脚数量。它们均匀分布在轮盘周围。
             }
+        });
 
-            // -------------------------------------------------------
-            // 当旋转动画完成时调用的函数，通过轮盘对象的回调功能指定了回调
-            // 注意，指示的段作为参数传递，因为 99% 的情况下你会想要知道这一点，以便通知用户他们的奖品。
-            // -------------------------------------------------------
-            function alertPrize(indicatedSegment)
-            {
-                // 基本的弹出显示段文本。
-                // 你可能想用这些信息做一些更有趣的事情。
-                alert("你赢得了 " + indicatedSegment.text);
-            }
+        // 创建音频对象并加载 tick.mp3 文件。
+        let audio = new Audio('tick.mp3');  
 
-            // =======================================================================================================================
-            // 下面的代码用于处理力度控制等，这完全是可选的。你可以通过调用 theWheel.startAnimation() 来简单地旋转轮盘。
-            // =======================================================================================================================
-            let wheelPower    = 0;
-            let wheelSpinning = false;
+        function playSound() {
+            // 如果声音已经在播放，则停止并倒回声音。
+            audio.pause();
+            audio.currentTime = 0;
 
-            // -------------------------------------------------------
-            // 处理力度按钮点击的函数。
-            // -------------------------------------------------------
-            function powerSelected(powerLevel)
-            {
-                // 确保在轮盘旋转时无法更改力度。
-                if (wheelSpinning == false) {
-                    // 重置所有颜色，以防这是用户第一次选择力度。
-                    document.getElementById('pw1').className = "";
-                    document.getElementById('pw2').className = "";
-                    document.getElementById('pw3').className = "";
+            // 播放声音。
+            audio.play();
+        }
 
-                    // 现在通过更改类来点亮所有低于并包括所选的单元格。
-                    if (powerLevel >= 1) {
-                        document.getElementById('pw1').className = "pw1";
-                    }
+        function alertPrize(indicatedSegment) {
+            let popup = document.getElementById('popup');
+            let popupMessage = document.getElementById('popupMessage');
+            
+            popupMessage.innerHTML = "恭喜你赢得了<br><span style='color: #ff4500; font-size: 28px;'>" + indicatedSegment.text + "</span>!";
+            popup.classList.add('show');
+        }
 
-                    if (powerLevel >= 2) {
-                        document.getElementById('pw2').className = "pw2";
-                    }
+        function playAgain() {
+            let popup = document.getElementById('popup');
+            popup.classList.remove('show');
+            resetWheel();
+        }
 
-                    if (powerLevel >= 3) {
-                        document.getElementById('pw3').className = "pw3";
-                    }
+        let wheelPower    = 0;
+        let wheelSpinning = false;
 
-                    // 设置 wheelPower 变量，旋转按钮点击时使用。
-                    wheelPower = powerLevel;
-
-                    // 通过更改其源图像并添加可点击类来点亮旋转按钮。
-                    document.getElementById('spin_button').src = "spin_on.png";
-                    document.getElementById('spin_button').className = "clickable";
-                }
-            }
-
-            // -------------------------------------------------------
-            // 旋转按钮的点击处理程序。
-            // -------------------------------------------------------
-            function startSpin()
-            {
-                // 确保在轮盘旋转时无法再次点击旋转按钮。
-                if (wheelSpinning == false) {
-                    // 根据选择的力度调整轮盘的旋转次数，旋转得越多，动画的持续时间越快。
-                    if (wheelPower == 1) {
-                        theWheel.animation.spins = 3;
-                    } else if (wheelPower == 2) {
-                        theWheel.animation.spins = 8;
-                    } else if (wheelPower == 3) {
-                        theWheel.animation.spins = 15;
-                    }
-
-                    // 禁用旋转按钮，以便在轮盘旋转期间不能再次点击。
-                    document.getElementById('spin_button').src       = "spin_off.png";
-                    document.getElementById('spin_button').className = "";
-
-                    // 通过调用 startAnimation 来开始旋转动画。
-                    theWheel.startAnimation();
-
-                    // 设置为 true，以便在当前动画期间无法更改力度和启用旋转按钮。用户必须重置才能再次旋转。
-                    wheelSpinning = true;
-                }
-            }
-
-            // -------------------------------------------------------
-            // 重置按钮的函数。
-            // -------------------------------------------------------
-            function resetWheel()
-            {
-                theWheel.stopAnimation(false);  // 停止动画，参数 false 以便不调用回调函数。
-                theWheel.rotationAngle = 0;     // 重置轮盘角度为 0 度。
-                theWheel.draw();                // 调用 draw 渲染轮盘的更改。
-
-                document.getElementById('pw1').className = "";  // 从力度级别指示器中删除所有颜色。
+        function powerSelected(powerLevel) {
+            if (wheelSpinning == false) {
+                document.getElementById('pw1').className = "";
                 document.getElementById('pw2').className = "";
                 document.getElementById('pw3').className = "";
 
-                wheelSpinning = false;          // 重置为 false，以便可以再次点击力度按钮和旋转按钮。
+                if (powerLevel >= 1) {
+                    document.getElementById('pw1').className = "pw1";
+                }
+                if (powerLevel >= 2) {
+                    document.getElementById('pw2').className = "pw2";
+                }
+                if (powerLevel >= 3) {
+                    document.getElementById('pw3').className = "pw3";
+                }
+
+                wheelPower = powerLevel;
+
+                document.getElementById('spin_button').src = "spin_on.png";
+                document.getElementById('spin_button').className = "clickable";
             }
-        </script>
-    </body>
+        }
+
+        function startSpin() {
+            if (wheelSpinning == false) {
+                if (wheelPower == 1) {
+                    theWheel.animation.spins = 3;
+                } else if (wheelPower == 2) {
+                    theWheel.animation.spins = 8;
+                } else if (wheelPower == 3) {
+                    theWheel.animation.spins = 15;
+                }
+
+                document.getElementById('spin_button').src       = "spin_off.png";
+                document.getElementById('spin_button').className = "";
+
+                theWheel.startAnimation();
+
+                wheelSpinning = true;
+            }
+        }
+
+        function resetWheel() {
+            theWheel.stopAnimation(false);  // 停止动画，参数 false 以便不调用回调函数。
+            theWheel.rotationAngle = 0;     // 重置轮盘角度为 0 度。
+            theWheel.draw();                // 调用 draw 渲染轮盘的更改。
+
+            document.getElementById('pw1').className = "";  // 从力度级别指示器中删除所有颜色。
+            document.getElementById('pw2').className = "";
+            document.getElementById('pw3').className = "";
+
+            wheelSpinning = false;          // 重置为 false，以便可以再次点击力度按钮和旋转按钮。
+            
+            // 重新启用旋转按钮
+            document.getElementById('spin_button').src = "spin_on.png";
+            document.getElementById('spin_button').className = "clickable";
+        }
+    </script>
+</body>
 </html>
