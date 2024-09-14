@@ -1,50 +1,39 @@
 <!--
-    Winhweel.js pins and sound example by Douglas McKechie @ www.dougtesting.net
-    See website for tutorials and other documentation.
+    Winhweel.js 针脚和声音示例 由 Douglas McKechie 提供 @ www.dougtesting.net
+    请访问网站获取教程和其他文档。
 
-    The MIT License (MIT)
+    MIT 许可证 (MIT)
 
-    Copyright (c) 2018 Douglas McKechie
+    版权所有 (c) 2018 Douglas McKechie
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+    特此免费授予任何获得本软件及相关文档（“软件”）副本的人，允许他们无限制地使用、复制、修改、合并、出版、分发、再许可和/或出售软件的副本，并允许向其提供软件的人这样做，前提是满足以下条件：
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
+    上述版权声明和本许可声明应包含在软件的所有副本或重要部分中。
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
+    本软件按“原样”提供，不附任何形式的明示或暗示的担保，包括但不限于适销性、特定目的适用性和不侵权的担保。在任何情况下，作者或版权持有人均不对因使用或其他交易中的软件或软件的使用而引起的任何索赔、损害或其他责任承担责任，无论是合同诉讼、侵权诉讼还是其他。
 
     ============================================================================
-    Note:
-        Tick Sound was recorded by DeepFrozenApps and was downloaded from http://soundbible.com/2044-Tick.html
-        It has an attribution 3.0 licence.
+
+    注：
+        Tick 音效由 DeepFrozenApps 录制，并从 http://soundbible.com/2044-Tick.html 下载。
+        它具有署名 3.0 许可证。
 -->
 <html>
     <head>
-        <title>HTML5 Canvas Winning Wheel</title>
+        <title>HTML5 Canvas 中奖轮盘</title>
         <link rel="stylesheet" href="main.css" type="text/css" />
         <script type="text/javascript" src="../../Winwheel.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
     </head>
     <body>
         <div align="center">
-            <h1>Winwheel.js example wheel - pins and sound wheel</h1>
+            <h1>Winwheel.js 示例轮盘 - 针脚和声音轮盘</h1>
             <p>
-                Here is an example of a wheel that contains pins around the outside (these represent the metal rods real prizewheels normally have).
-                <br />Also this wheel plays a tick sound when one of the pins passes the pointer.
+                这是一个包含外部针脚的轮盘示例（这些代表了真实奖品轮盘通常拥有的金属杆）。
+                <br />此外，当其中一个针脚经过指针时，轮盘会播放滴答声。
             </p>
             <br />
-            <p>Choose a power setting then press the Spin button. Tick sound will play when a pin passes the pointer.</p>
+            <p>选择一个力度设置，然后按下旋转按钮。滴答声将在针脚经过指针时播放。</p>
             <br />
             <table cellpadding="0" cellspacing="0" border="0">
                 <tr>
@@ -54,111 +43,110 @@
                             <br />
                             <table class="power" cellpadding="10" cellspacing="0">
                                 <tr>
-                                    <th align="center">Power</th>
+                                    <th align="center">力度</th>
                                 </tr>
                                 <tr>
-                                    <td width="78" align="center" id="pw3" onClick="powerSelected(3);">High</td>
+                                    <td width="78" align="center" id="pw3" onClick="powerSelected(3);">高</td>
                                 </tr>
                                 <tr>
-                                    <td align="center" id="pw2" onClick="powerSelected(2);">Med</td>
+                                    <td align="center" id="pw2" onClick="powerSelected(2);">中</td>
                                 </tr>
                                 <tr>
-                                    <td align="center" id="pw1" onClick="powerSelected(1);">Low</td>
+                                    <td align="center" id="pw1" onClick="powerSelected(1);">低</td>
                                 </tr>
                             </table>
                             <br />
-                            <img id="spin_button" src="spin_off.png" alt="Spin" onClick="startSpin();" />
+                            <img id="spin_button" src="spin_off.png" alt="旋转" onClick="startSpin();" />
                             <br /><br />
-                            &nbsp;&nbsp;<a href="#" onClick="resetWheel(); return false;">Play Again</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(reset)
+                            &nbsp;&nbsp;<a href="#" onClick="resetWheel(); return false;">再玩一次</a><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(重置)
                         </div>
                     </td>
                     <td width="438" height="582" class="the_wheel" align="center" valign="center">
                         <canvas id="canvas" width="434" height="434">
-                            <p style="{color: white}" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>
+                            <p style="{color: white}" align="center">对不起，您的浏览器不支持 canvas。请尝试其他浏览器。</p>
                         </canvas>
                     </td>
                 </tr>
             </table>
         </div>
         <script>
-            // Create new wheel object specifying the parameters at creation time.
+            // 创建新的轮盘对象并在创建时指定参数。
             let theWheel = new Winwheel({
-                'numSegments'  : 8,     // Specify number of segments.
-                'outerRadius'  : 212,   // Set outer radius so wheel fits inside the background.
-                'textFontSize' : 28,    // Set font size as desired.
-                'segments'     :        // Define segments including colour and text.
+                'numSegments'  : 8,     // 指定段的数量。
+                'outerRadius'  : 212,   // 设置外半径，以便轮盘适合背景。
+                'textFontSize' : 28,    // 设置所需的字体大小。
+                'segments'     :        // 定义段，包括颜色和文本。
                 [
-                   {'fillStyle' : '#eae56f', 'text' : 'Prize 1'},
-                   {'fillStyle' : '#89f26e', 'text' : 'Prize 2'},
-                   {'fillStyle' : '#7de6ef', 'text' : 'Prize 3'},
-                   {'fillStyle' : '#e7706f', 'text' : 'Prize 4'},
-                   {'fillStyle' : '#eae56f', 'text' : 'Prize 5'},
-                   {'fillStyle' : '#89f26e', 'text' : 'Prize 6'},
-                   {'fillStyle' : '#7de6ef', 'text' : 'Prize 7'},
-                   {'fillStyle' : '#e7706f', 'text' : 'Prize 8'}
+                   {'fillStyle' : '#eae56f', 'text' : '奖品 1'},
+                   {'fillStyle' : '#89f26e', 'text' : '奖品 2'},
+                   {'fillStyle' : '#7de6ef', 'text' : '奖品 3'},
+                   {'fillStyle' : '#e7706f', 'text' : '奖品 4'},
+                   {'fillStyle' : '#eae56f', 'text' : '奖品 5'},
+                   {'fillStyle' : '#89f26e', 'text' : '奖品 6'},
+                   {'fillStyle' : '#7de6ef', 'text' : '奖品 7'},
+                   {'fillStyle' : '#e7706f', 'text' : '奖品 8'}
                 ],
-                'animation' :           // Specify the animation to use.
+                'animation' :           // 指定使用的动画。
                 {
                     'type'     : 'spinToStop',
                     'duration' : 15,
                     'spins'    : 8,
                     'callbackFinished' : alertPrize,
-                    'callbackSound'    : playSound,   // Function to call when the tick sound is to be triggered.
-                    'soundTrigger'     : 'pin'        // Specify pins are to trigger the sound, the other option is 'segment'.
+                    'callbackSound'    : playSound,   // 当需要触发滴答声时调用的函数。
+                    'soundTrigger'     : 'pin'        // 指定触发声音的针脚，另一种选项是 'segment'。
                 },
                 'pins' :
                 {
-                    'number' : 16   // Number of pins. They space evenly around the wheel.
+                    'number' : 16   // 针脚数量。它们均匀分布在轮盘周围。
                 }
             });
 
             // -----------------------------------------------------------------
-            // This function is called when the segment under the prize pointer changes
-            // we can play a small tick sound here like you would expect on real prizewheels.
+            // 当奖品指针下的段发生变化时调用此函数
+            // 我们可以在这里播放像真实奖品轮盘那样的小滴答声。
             // -----------------------------------------------------------------
-            let audio = new Audio('tick.mp3');  // Create audio object and load tick.mp3 file.
+            let audio = new Audio('tick.mp3');  // 创建音频对象并加载 tick.mp3 文件。
 
             function playSound()
             {
-                // Stop and rewind the sound if it already happens to be playing.
+                // 如果声音已经在播放，则停止并倒回声音。
                 audio.pause();
                 audio.currentTime = 0;
 
-                // Play the sound.
+                // 播放声音。
                 audio.play();
             }
 
             // -------------------------------------------------------
-            // Called when the spin animation has finished by the callback feature of the wheel because I specified callback in the parameters
-            // note the indicated segment is passed in as a parmeter as 99% of the time you will want to know this to inform the user of their prize.
+            // 当旋转动画完成时调用的函数，通过轮盘对象的回调功能指定了回调
+            // 注意，指示的段作为参数传递，因为 99% 的情况下你会想要知道这一点，以便通知用户他们的奖品。
             // -------------------------------------------------------
             function alertPrize(indicatedSegment)
             {
-                // Do basic alert of the segment text.
-                // You would probably want to do something more interesting with this information.
-                alert("You have won " + indicatedSegment.text);
+                // 基本的弹出显示段文本。
+                // 你可能想用这些信息做一些更有趣的事情。
+                alert("你赢得了 " + indicatedSegment.text);
             }
 
             // =======================================================================================================================
-            // Code below for the power controls etc which is entirely optional. You can spin the wheel simply by
-            // calling theWheel.startAnimation();
+            // 下面的代码用于处理力度控制等，这完全是可选的。你可以通过调用 theWheel.startAnimation() 来简单地旋转轮盘。
             // =======================================================================================================================
             let wheelPower    = 0;
             let wheelSpinning = false;
 
             // -------------------------------------------------------
-            // Function to handle the onClick on the power buttons.
+            // 处理力度按钮点击的函数。
             // -------------------------------------------------------
             function powerSelected(powerLevel)
             {
-                // Ensure that power can't be changed while wheel is spinning.
+                // 确保在轮盘旋转时无法更改力度。
                 if (wheelSpinning == false) {
-                    // Reset all to grey incase this is not the first time the user has selected the power.
+                    // 重置所有颜色，以防这是用户第一次选择力度。
                     document.getElementById('pw1').className = "";
                     document.getElementById('pw2').className = "";
                     document.getElementById('pw3').className = "";
 
-                    // Now light up all cells below-and-including the one selected by changing the class.
+                    // 现在通过更改类来点亮所有低于并包括所选的单元格。
                     if (powerLevel >= 1) {
                         document.getElementById('pw1').className = "pw1";
                     }
@@ -171,24 +159,23 @@
                         document.getElementById('pw3').className = "pw3";
                     }
 
-                    // Set wheelPower var used when spin button is clicked.
+                    // 设置 wheelPower 变量，旋转按钮点击时使用。
                     wheelPower = powerLevel;
 
-                    // Light up the spin button by changing it's source image and adding a clickable class to it.
+                    // 通过更改其源图像并添加可点击类来点亮旋转按钮。
                     document.getElementById('spin_button').src = "spin_on.png";
                     document.getElementById('spin_button').className = "clickable";
                 }
             }
 
             // -------------------------------------------------------
-            // Click handler for spin button.
+            // 旋转按钮的点击处理程序。
             // -------------------------------------------------------
             function startSpin()
             {
-                // Ensure that spinning can't be clicked again while already running.
+                // 确保在轮盘旋转时无法再次点击旋转按钮。
                 if (wheelSpinning == false) {
-                    // Based on the power level selected adjust the number of spins for the wheel, the more times is has
-                    // to rotate with the duration of the animation the quicker the wheel spins.
+                    // 根据选择的力度调整轮盘的旋转次数，旋转得越多，动画的持续时间越快。
                     if (wheelPower == 1) {
                         theWheel.animation.spins = 3;
                     } else if (wheelPower == 2) {
@@ -197,33 +184,32 @@
                         theWheel.animation.spins = 15;
                     }
 
-                    // Disable the spin button so can't click again while wheel is spinning.
+                    // 禁用旋转按钮，以便在轮盘旋转期间不能再次点击。
                     document.getElementById('spin_button').src       = "spin_off.png";
                     document.getElementById('spin_button').className = "";
 
-                    // Begin the spin animation by calling startAnimation on the wheel object.
+                    // 通过调用 startAnimation 来开始旋转动画。
                     theWheel.startAnimation();
 
-                    // Set to true so that power can't be changed and spin button re-enabled during
-                    // the current animation. The user will have to reset before spinning again.
+                    // 设置为 true，以便在当前动画期间无法更改力度和启用旋转按钮。用户必须重置才能再次旋转。
                     wheelSpinning = true;
                 }
             }
 
             // -------------------------------------------------------
-            // Function for reset button.
+            // 重置按钮的函数。
             // -------------------------------------------------------
             function resetWheel()
             {
-                theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
-                theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
-                theWheel.draw();                // Call draw to render changes to the wheel.
+                theWheel.stopAnimation(false);  // 停止动画，参数 false 以便不调用回调函数。
+                theWheel.rotationAngle = 0;     // 重置轮盘角度为 0 度。
+                theWheel.draw();                // 调用 draw 渲染轮盘的更改。
 
-                document.getElementById('pw1').className = "";  // Remove all colours from the power level indicators.
+                document.getElementById('pw1').className = "";  // 从力度级别指示器中删除所有颜色。
                 document.getElementById('pw2').className = "";
                 document.getElementById('pw3').className = "";
 
-                wheelSpinning = false;          // Reset to false to power buttons and spin can be clicked again.
+                wheelSpinning = false;          // 重置为 false，以便可以再次点击力度按钮和旋转按钮。
             }
         </script>
     </body>
